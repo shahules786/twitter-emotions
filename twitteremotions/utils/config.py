@@ -7,7 +7,6 @@ class Config:
         self.DEVICE = "cuda"
         self.MAX_LEN = 168
         self.PATH = "../input/tf-roberta/"
-        self.MODEL_PATH = ""
         self.TOKENIZER = tokenizers.ByteLevelBPETokenizer(
             vocab_file=self.PATH + "vocab-roberta-base.json",
             merges_file=self.PATH + "merges-roberta-base.txt",
