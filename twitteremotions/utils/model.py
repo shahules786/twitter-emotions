@@ -1,6 +1,6 @@
 import tensorflow as tf
 from transformers import RobertaConfig, TFRobertaConfig, TFRobertaModel
-from config import Config
+from utils.config import Config
 
 conf = Config()
 MAX_LEN = conf.MAX_LEN

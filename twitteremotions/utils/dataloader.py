@@ -1,6 +1,6 @@
 import tokenizers
 import numpy as np
-from config import Config
+from utils.config import Config
 import tensorflow as tf
 
 conf = Config()
@@ -30,7 +30,7 @@ class Dataprocess:
         input_ids[0, : len(enc.ids) + 5] = [0] + enc.ids + [2, 2] + [sent_id] + [2]
         attention_mask[0, : len(enc.ids) + 5] = 1
 
-        return {"input_ids": input_ids, "attention_mask": attention_mask, "token_type_id": token_type_id}
+        return [input_ids, attention_mask, token_type_id]
 
     def preprocess_output(self, pred_start, pred_end):
 
