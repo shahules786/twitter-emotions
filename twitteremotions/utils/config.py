@@ -5,3 +5,9 @@ class Config:
         self.MAX_LEN = 168
         self.PATH = "../input/tf-roberta/"
         self.MODEL_PATH = ""
+        self.TOKENIZER = tokenizers.ByteLevelBPETokenizer(
+            vocab_file=PATH + "vocab-roberta-base.json",
+            merges_file=PATH + "merges-roberta-base.txt",
+            lowercase=True,
+            add_prefix_space=True,
+        )

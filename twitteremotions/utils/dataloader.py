@@ -1,6 +1,7 @@
 import tokenizers
 import numpy as np
 from config import Config
+import tensorflow as tf
 
 conf = Config()
 MAX_LEN = conf.MAX_LEN
@@ -11,12 +12,7 @@ class Dataprocess:
     def __init(self, text, sentiment):
 
         self.text = text
-        self.tokenizer = tokenizers.ByteLevelBPETokenizer(
-            vocab_file=PATH + "vocab-roberta-base.json",
-            merges_file=PATH + "merges-roberta-base.txt",
-            lowercase=True,
-            add_prefix_space=True,
-        )
+        self.tokenizer = conf.TOKENIZER
         self.sentiment_id = {"positive": 1313, "negative": 2430, "neutral": 7974}
         self.sentiment = sentiment
 
