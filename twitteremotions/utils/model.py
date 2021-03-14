@@ -1,5 +1,5 @@
 import tensorflow as tf
-from transformers import RobertaConfig,TFRobertaConfig
+from transformers import RobertaConfig, TFRobertaConfig, TFRobertaModel
 from config import Config
 
 conf = Config()

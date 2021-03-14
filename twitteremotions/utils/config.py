@@ -1,3 +1,6 @@
+import tokenizers
+
+
 class Config:
     def __init__(self):
 
@@ -6,8 +9,8 @@ class Config:
         self.PATH = "../input/tf-roberta/"
         self.MODEL_PATH = ""
         self.TOKENIZER = tokenizers.ByteLevelBPETokenizer(
-            vocab_file=PATH + "vocab-roberta-base.json",
-            merges_file=PATH + "merges-roberta-base.txt",
+            vocab_file=self.PATH + "vocab-roberta-base.json",
+            merges_file=self.PATH + "merges-roberta-base.txt",
             lowercase=True,
             add_prefix_space=True,
         )
