@@ -1,26 +1,22 @@
 import tokenizers
 import numpy as np
-from utils.config import Config
 import tensorflow as tf
-
-conf = Config()
-MAX_LEN = conf.MAX_LEN
-PATH = conf.PATH
 
 
 class Dataprocess:
-    def __init(self, text, sentiment):
+    def __init(self, text, sentiment, tokenizer):
 
         self.text = text
-        self.tokenizer = conf.TOKENIZER
+        self.tokenizer = tokenizer
         self.sentiment_id = {"positive": 1313, "negative": 2430, "neutral": 7974}
         self.sentiment = sentiment
+        self.MAX_LEN = 168
 
     def preprocess_bert(self):
 
-        input_ids = np.ones((1, MAX_LEN), dtype="int32")
-        attention_mask = np.zeros((1, MAX_LEN), dtype="int32")
-        token_type_id = np.zeros((1, MAX_LEN), dtype="int32")
+        input_ids = np.ones((1, self.MAX_LEN), dtype="int32")
+        attention_mask = np.zeros((1, self.MAX_LEN), dtype="int32")
+        token_type_id = np.zeros((1, self.MAX_LEN), dtype="int32")
 
         assert type(self.text) == str, "input should be a string"
 
@@ -46,9 +42,10 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     """generates data"""
 
-    def __init__(self, df, batch_size=32, shuffle=True, is_test=False):
+    def __init__(self, df, tokenizer, batch_size=32, shuffle=True, is_test=False, MAX_LEN=168):
 
-        self.max_len = conf.MAX_LEN
+        self.max_len = MAX_LEN
+        self.tokenizer = tokenizer
         self.batch_size = batch_size
         self.df = df
         self.sentiment_id = {"positive": 1313, "negative": 2430, "neutral": 7974}
@@ -82,18 +79,18 @@ class DataGenerator(tf.keras.utils.Sequence):
     def __data_generation(self, list_IDs_temp):
         "Generates data containing batch_size samples"  # X : (n_samples, *dim, n_channels)
         # Initialization
-        input_ids = np.ones((self.batch_size, conf.MAX_LEN), dtype="int32")
-        attention_mask = np.zeros((self.batch_size, conf.MAX_LEN), dtype="int32")
-        token_type_ids = np.zeros((self.batch_size, conf.MAX_LEN), dtype="int32")
-        start_tokens = np.zeros((self.batch_size, conf.MAX_LEN), dtype="int32")
-        end_tokens = np.zeros((self.batch_size, conf.MAX_LEN), dtype="int32")
+        input_ids = np.ones((self.batch_size, self.MAX_LEN), dtype="int32")
+        attention_mask = np.zeros((self.batch_size, self.MAX_LEN), dtype="int32")
+        token_type_ids = np.zeros((self.batch_size, self.MAX_LEN), dtype="int32")
+        start_tokens = np.zeros((self.batch_size, self.MAX_LEN), dtype="int32")
+        end_tokens = np.zeros((self.batch_size, self.MAX_LEN), dtype="int32")
 
         # Generate data
         for k, ID in enumerate(list_IDs_temp):
             # Store sample
             # FIND OVERLAP
             text1 = " " + " ".join(self.df.loc[ID, "text"].split())
-            enc = conf.TOKENIZER.encode(text1)
+            enc = self.tokenizer.encode(text1)
 
             s_tok = self.sentiment_id[self.df.loc[ID, "sentiment"]]
             input_ids[k, : len(enc.ids) + 5] = [0] + enc.ids + [2, 2] + [s_tok] + [2]
