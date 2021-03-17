@@ -11,10 +11,11 @@ import logging
 
 
 class TwitterEmotions:
-    def __init(self, model_path, path, device="cuda", lowercase=True):
+    def __init(self, model_path, path, device="cuda", lowercase=True, MAX_LEN=168):
 
         self.MODEL_PATH = model_path
         self.DEVICE = device
+        self.MAX_LEN = MAX_LEN
         self.TOKENIZER = tokenizers.ByteLevelBPETokenizer(
             vocab_file=path + "vocab-roberta-base.json",
             merges_file=path + "merges-roberta-base.txt",
@@ -29,8 +30,8 @@ class TwitterEmotions:
 
         df = pd.read_csv(train_path)
         train, test = train_test_split(df, test_size=test_size, random_state=42)
-        train_datagen = DataGenerator(train, batch_size=batch_size, is_test=False)
-        test_datagen = DataGenerator(test, batch_size=batch_size, is_test=False)
+        train_datagen = DataGenerator(train, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
+        test_datagen = DataGenerator(test, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
 
         model = emotion_model()
 
@@ -50,7 +51,7 @@ class TwitterEmotions:
 
     def predict(self, text, sentimemt):
 
-        data = Dataprocess(text, sentimemt)
+        data = Dataprocess(text, sentimemt, self.TOKENIZER)
         input_ids, attention_mask, token_typeids = data.preprocess_bert()
         model = emotion_model()
         model.load_weights(os.path.join(self.MODEL_PATH, "roberta_model.h5"))
