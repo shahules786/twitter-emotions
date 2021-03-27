@@ -1,20 +1,15 @@
 import tensorflow as tf
-from transformers import RobertaConfig, TFRobertaConfig, TFRobertaModel
-from utils.config import Config
-
-conf = Config()
-MAX_LEN = conf.MAX_LEN
-PATH = conf.PATH
+from transformers import TFRobertaModel, RobertaConfig
 
 
-def emotion_model():
+def emotion_model(path="data/tf_roberta/", maxlen=168):
 
-    ids = tf.keras.layers.Input((MAX_LEN,), dtype=tf.int32)
-    att = tf.keras.layers.Input((MAX_LEN,), dtype=tf.int32)
-    tok = tf.keras.layers.Input((MAX_LEN,), dtype=tf.int32)
+    ids = tf.keras.layers.Input((maxlen,), dtype=tf.int32)
+    att = tf.keras.layers.Input((maxlen,), dtype=tf.int32)
+    tok = tf.keras.layers.Input((maxlen,), dtype=tf.int32)
 
-    config = RobertaConfig.from_pretrained(PATH + "config-roberta-base.json")
-    bert_model = TFRobertaModel.from_pretrained(PATH + "pretrained-roberta-base.h5", config=config)
+    config = RobertaConfig.from_pretrained(path + "config-roberta-base.json")
+    bert_model = TFRobertaModel.from_pretrained(path + "pretrained-roberta-base.h5", config=config)
     x = bert_model(ids, attention_mask=att, token_type_ids=tok)
 
     x1 = tf.keras.layers.Dropout(0.1)(x[0])

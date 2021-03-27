@@ -44,7 +44,7 @@ class DataGenerator(tf.keras.utils.Sequence):
 
     def __init__(self, df, tokenizer, batch_size=32, shuffle=True, is_test=False, MAX_LEN=168):
 
-        self.max_len = MAX_LEN
+        self.MAX_LEN = MAX_LEN
         self.tokenizer = tokenizer
         self.batch_size = batch_size
         self.df = df
@@ -113,7 +113,7 @@ class DataGenerator(tf.keras.utils.Sequence):
                     start_tokens[k, toks[0] + 1] = 1
                     end_tokens[k, toks[-1] + 1] = 1
 
-                return ([input_ids, attention_mask, token_type_ids], [start_tokens, end_tokens])
+                return [input_ids, attention_mask, token_type_ids], [start_tokens, end_tokens]
 
             else:
-                return ([input_ids, attention_mask, token_type_ids],)
+                return [input_ids, attention_mask, token_type_ids]
