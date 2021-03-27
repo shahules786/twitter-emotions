@@ -4,14 +4,15 @@ import numpy as np
 import tokenizers
 from utils.model import emotion_model
 from utils.dataloader import Dataprocess, DataGenerator
-from utils.config import Config
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 import logging
 
 
 class TwitterEmotions:
-    def __init(self, model_path, path, device="cuda", lowercase=True, MAX_LEN=168):
+    def __init__(
+        self, model_path="data/tf_model.h5", path="data/tf_roberta/", device="cuda", lowercase=True, MAX_LEN=168
+    ):
 
         self.MODEL_PATH = model_path
         self.DEVICE = device
@@ -23,12 +24,12 @@ class TwitterEmotions:
             add_prefix_space=True,
         )
 
-    def train(self, train_path, epochs=10, batch_size=32, max_len=168, test_size=0.25):
+    def train(self, train_path="data/train.csv", epochs=10, batch_size=32, max_len=168, test_size=0.25):
 
         if not os.path.exists(train_path):
             raise FileNotFoundError("Please provide a valid train file path")
 
-        df = pd.read_csv(train_path)
+        df = pd.read_csv(train_path).fillna("")
         train, test = train_test_split(df, test_size=test_size, random_state=42)
         train_datagen = DataGenerator(train, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
         test_datagen = DataGenerator(test, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
