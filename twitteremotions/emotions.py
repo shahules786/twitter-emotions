@@ -29,7 +29,7 @@ class TwitterEmotions:
         if not os.path.exists(train_path):
             raise FileNotFoundError("Please provide a valid train file path")
 
-        df = pd.read_csv(train_path)
+        df = pd.read_csv(train_path).fillna("")
         train, test = train_test_split(df, test_size=test_size, random_state=42)
         train_datagen = DataGenerator(train, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
         test_datagen = DataGenerator(test, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
