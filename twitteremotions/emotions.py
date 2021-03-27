@@ -11,7 +11,7 @@ import logging
 
 class TwitterEmotions:
     def __init__(
-        self, model_path="data/tf_model.h5", path="data/tf_roberta/", device="cuda", lowercase=True, MAX_LEN=168
+        self, model_path="data/tf_roberta/", path="data/tf_roberta/", device="cuda", lowercase=True, MAX_LEN=168
     ):
 
         self.MODEL_PATH = model_path
@@ -55,7 +55,8 @@ class TwitterEmotions:
         data = Dataprocess(text, sentimemt, self.TOKENIZER)
         input_ids, attention_mask, token_typeids = data.preprocess_bert()
         model = emotion_model()
-        model.load_weights(os.path.join(self.MODEL_PATH, "roberta_model.h5"))
+        print(model.summary())
+        model.load_weights(os.path.join(self.MODEL_PATH, "tf_model.h5"))
         start, end = model.predict([input_ids, attention_mask, token_typeids])
         output = data.preprocess_output(start, end)
         return output
