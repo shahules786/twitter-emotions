@@ -26,4 +26,3 @@ class EmotionModel(nn.Module):
         x1 = torch.sigmoid(x1)
 
         return x1, x2
-
