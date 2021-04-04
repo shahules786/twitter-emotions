@@ -1,32 +1,29 @@
-import tensorflow as tf
-from transformers import TFRobertaModel, RobertaConfig
+import torch.nn as nn
+import torch
+from transformers import RobertaModel, RobertaConfig
 
 
-def emotion_model(path="data/tf_roberta/", maxlen=168):
+class EmotionModel(nn.Module):
+    def __init__(self, PATH="data/tf_roberta/"):
+        super(EmotionModel, self).__init__()
+        config = RobertaConfig.from_pretrained(PATH + "config.json", return_dict=False)
+        self.bert_model = RobertaModel.from_pretrained(PATH + "pytorch_model.bin", config=config)
+        self.dropout = nn.Dropout(0.1)
+        self.linear1 = nn.Linear(768, 1)
+        self.linear2 = nn.Linear(768 + 1, 1)
 
-    ids = tf.keras.layers.Input((maxlen,), dtype=tf.int32)
-    att = tf.keras.layers.Input((maxlen,), dtype=tf.int32)
-    tok = tf.keras.layers.Input((maxlen,), dtype=tf.int32)
+    def forward(self, input_ids, attention_mask):
 
-    config = RobertaConfig.from_pretrained(path + "config-roberta-base.json")
-    bert_model = TFRobertaModel.from_pretrained(path + "pretrained-roberta-base.h5", config=config)
-    x = bert_model(ids, attention_mask=att, token_type_ids=tok)
+        out, _ = self.bert_model(input_ids=input_ids, attention_mask=attention_mask)
+        x = self.dropout(out)
+        x2b = self.linear1(x)
+        x2 = torch.flatten(x2b, 1)
+        x2 = torch.sigmoid(x2)
 
-    # END INDEX HEAD
-    x2 = tf.keras.layers.Dropout(0.1)(x[0])
-    x2b = tf.keras.layers.Dense(1)(x2)
-    x2 = tf.keras.layers.Flatten()(x2b)
-    x2 = tf.keras.layers.Activation("softmax")(x2)
+        x1 = torch.cat((out, x2b), 2)
+        x1 = self.linear2(x1)
+        x1 = torch.flatten(x1, 1)
+        x1 = torch.sigmoid(x1)
 
-    # START INDEX HEAD
-    x1 = tf.keras.layers.Concatenate()([x2b, x[0]])
-    x1 = tf.keras.layers.Dropout(0.1)(x1)
-    x1 = tf.keras.layers.Dense(1)(x1)
-    x1 = tf.keras.layers.Flatten()(x1)
-    x1 = tf.keras.layers.Activation("softmax")(x1)
+        return x1, x2
 
-    model = tf.keras.models.Model(inputs=[ids, att, tok], outputs=[x1, x2])
-    optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5)
-    model.compile(loss="categorical_crossentropy", optimizer=optimizer)
-
-    return model
