@@ -1,25 +1,25 @@
 import os
 import pandas as pd
 import numpy as np
-import tokenizers
-from utils.model import emotion_model
-from utils.dataloader import Dataprocess, DataGenerator
+from tokenizers import AdamW, get_linear_schedule_with_warmup, ByteLevelBPETokenizer
+from utils.model import EmotionModel
+from utils.dataloader import Dataprocess, EmotionData
+from torch.utils.data import DataLoader
+from utils.engine import train_fn, eval_fn
 from sklearn.model_selection import train_test_split
-import tensorflow as tf
+import torch
 import logging
 
 
 class TwitterEmotions:
-    def __init__(
-        self, model_path="data/tf_roberta/", path="data/tf_roberta/", device="cuda", lowercase=True, MAX_LEN=168
-    ):
+    def __init__(self, model_path="data/roberta/", path="data/roberta/", device="cuda", lowercase=True, MAX_LEN=168):
 
         self.MODEL_PATH = model_path
         self.DEVICE = device
         self.MAX_LEN = MAX_LEN
-        self.TOKENIZER = tokenizers.ByteLevelBPETokenizer(
-            vocab_file=path + "vocab-roberta-base.json",
-            merges_file=path + "merges-roberta-base.txt",
+        self.TOKENIZER = ByteLevelBPETokenizer(
+            vocab_file=path + "vocab.json",
+            merges_file=path + "merges.txt",
             lowercase=lowercase,
             add_prefix_space=True,
         )
@@ -31,22 +31,27 @@ class TwitterEmotions:
 
         df = pd.read_csv(train_path).fillna("")
         train, test = train_test_split(df, test_size=test_size, random_state=42)
-        train_datagen = DataGenerator(train, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
-        test_datagen = DataGenerator(test, tokenizer=self.TOKENIZER, batch_size=batch_size, is_test=False)
+        train_dataloader = DataLoader(EmotionData(train), batch_size=batch_size, shuffle=True)
+        test_dataloader = DataLoader(EmotionData(test, is_test=True), batch_size=batch_size, shuffle=True)
 
-        model = emotion_model()
+        DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        sv = tf.keras.callbacks.ModelCheckpoint(
-            "roberta_model.h5",
-            monitor="val_loss",
-            verbose=1,
-            save_best_only=True,
-            save_weights_only=True,
-            mode="auto",
-            save_freq="epoch",
-        )
+        model = EmotionModel()
+        model.to(DEVICE)
 
-        model.fit(train_datagen, epochs=epochs, validation_data=test_datagen, callbacks=[sv], verbose=1)
+        num_train_steps = int(len(train) / batch_size * epochs)
+        optimizer = AdamW(model.parameters(), lr=3e-3)
+        scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=num_train_steps)
+
+        best_loss = np.inf
+        for epoch in range(epochs):
+            train_loss = train_fn(train_dataloader, model, optimizer, DEVICE, scheduler)
+            valid_loss = eval_fn(test_dataloader, model, DEVICE)
+
+            if valid_loss < best_loss:
+                torch.save(model.state_dict(), "model.pt")
+
+            print(f"Epoch:{epoch}  train loss -- > {train_loss : .3f}  valid loss --> {valid_loss : .3f}")
 
         logging.info("Model trained succesfully")
 
@@ -54,7 +59,7 @@ class TwitterEmotions:
 
         data = Dataprocess(text, sentimemt, self.TOKENIZER)
         input_ids, attention_mask, token_typeids = data.preprocess_bert()
-        model = emotion_model()
+        model = EmotionModel()
         print(model.summary())
         model.load_weights(os.path.join(self.MODEL_PATH, "tf_model.h5"))
         start, end = model.predict([input_ids, attention_mask, token_typeids])
