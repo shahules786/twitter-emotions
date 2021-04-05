@@ -9,7 +9,7 @@ class Dataprocess:
 
         self.text = text
         self.tokenizer = tokenizer
-        self.sentiment_id = {"positive": 1313, "negative": 2430, "neutral": 7974}
+        self.sentiment_id = {"positive": 22173, "negative": 33407, "neutral": 12516}
         self.sentiment = sentiment
         self.MAX_LEN = 168
 
@@ -49,7 +49,7 @@ class EmotionData(Dataset):
 
         self.MAX_LEN = MAX_LEN
         self.df = df
-        self.sentiment_id = {"positive": 1313, "negative": 2430, "neutral": 7974}
+        self.sentiment_id = {"positive": 22173, "negative": 33407, "neutral": 12516}
         self.is_test = is_test
         self.list_IDs = df.index.values.tolist()
         self.tokenizer = tokenizer
