@@ -18,11 +18,9 @@ class EmotionModel(nn.Module):
         x = self.dropout(out)
         x2b = self.linear1(x)
         x2 = torch.flatten(x2b, 1)
-        x2 = torch.sigmoid(x2)
 
         x1 = torch.cat((out, x2b), 2)
         x1 = self.linear2(x1)
         x1 = torch.flatten(x1, 1)
-        x1 = torch.sigmoid(x1)
 
         return x1, x2

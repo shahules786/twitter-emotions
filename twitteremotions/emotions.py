@@ -61,7 +61,7 @@ class TwitterEmotions:
         input_ids, attention_mask, token_typeids = data.preprocess_bert()
         model = EmotionModel()
         print(model.summary())
-        model.load_weights(os.path.join(self.MODEL_PATH, "tf_model.h5"))
+        model.load_weights(os.path.join(self.MODEL_PATH, "roberta_model.pth"))
         start, end = model.predict([input_ids, attention_mask, token_typeids])
         output = data.preprocess_output(start, end)
         return output
