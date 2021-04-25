@@ -9,9 +9,9 @@ class Dataprocess:
 
         self.text = text
         self.tokenizer = tokenizer
-        self.sentiment_id = {"positive": 22173, "negative": 33407, "neutral": 12516}
+        self.sentiment_id = {"positive": 1313, "negative": 2430, "neutral": 7974}
         self.sentiment = sentiment
-        self.MAX_LEN = 168
+        self.MAX_LEN = 96
 
     def preprocess_bert(self):
 
@@ -23,7 +23,7 @@ class Dataprocess:
         self.text = " " + " ".join(self.text.split())
         enc = self.tokenizer.encode(self.text)
         sent_id = self.sentiment_id[self.sentiment]
-        input_ids[: len(enc.ids) + 5] = [0] + enc.ids + [2, 2] + [sent_id] + [2]
+        input_ids[: len(enc.ids) + 5] = [0] + [sent_id] + [2, 2] + enc.ids + [2]
         attention_mask[: len(enc.ids) + 5] = 1
 
         return {
@@ -33,10 +33,12 @@ class Dataprocess:
 
     def preprocess_output(self, pred_start, pred_end):
 
+        pred_start = torch.softmax(pred_start).cpu().detach().numpy()
+        pred_end = torch.softmax(pred_end).cpu().detach().numpy()
         start = np.argmax(pred_start)
-        end = np.argmax(pred_end)
+        end = np.argmax(pred_end) + 1
         ids = self.tokenizer.encode(" " + " ".join(self.text.split())).ids
-        output = self.tokenizer.decode(ids[start - 1 : end])
+        output = self.tokenizer.decode(ids[start:end])
 
         return output
 
@@ -45,11 +47,11 @@ class EmotionData(Dataset):
 
     """generates data"""
 
-    def __init__(self, df, tokenizer, is_test=False, MAX_LEN=168):
+    def __init__(self, df, tokenizer, is_test=False, MAX_LEN=96):
 
         self.MAX_LEN = MAX_LEN
         self.df = df
-        self.sentiment_id = {"positive": 22173, "negative": 33407, "neutral": 12516}
+        self.sentiment_id = {"positive": 1313, "negative": 2430, "neutral": 7974}
         self.is_test = is_test
         self.list_IDs = df.index.values.tolist()
         self.tokenizer = tokenizer
@@ -71,7 +73,7 @@ class EmotionData(Dataset):
         enc = self.tokenizer.encode(text1)
 
         s_tok = self.sentiment_id[self.df.loc[index, "sentiment"]]
-        input_ids[: len(enc.ids) + 5] = [0] + enc.ids + [2, 2] + [s_tok] + [2]
+        input_ids[: len(enc.ids) + 5] = [0] + [s_tok] + [2, 2] + enc.ids + [2]
         attention_mask[: len(enc.ids) + 5] = 1
 
         if not self.is_test:
