@@ -26,10 +26,10 @@ class Dataprocess:
         input_ids[: len(enc.ids) + 5] = [0] + [sent_id] + [2, 2] + enc.ids + [2]
         attention_mask[: len(enc.ids) + 5] = 1
 
-        return {
-            "input_ids": torch.tensor(input_ids, dtype=torch.long),
-            "attention_mask": torch.tensor(attention_mask, dtype=torch.long),
-        }
+        return (
+            torch.tensor(input_ids, dtype=torch.long),
+            torch.tensor(attention_mask, dtype=torch.long),
+        )
 
     def preprocess_output(self, pred_start, pred_end):
 
