@@ -49,7 +49,7 @@ class TwitterEmotions:
             valid_loss = eval_fn(test_dataloader, model, DEVICE)
 
             if valid_loss < best_loss:
-                torch.save(model.state_dict(), "model.pt")
+                torch.save(model.state_dict(), "roberta_model.pth")
 
             print(f"Epoch:{epoch}  train loss -- > {train_loss : .3f}  valid loss --> {valid_loss : .3f}")
 
@@ -58,10 +58,10 @@ class TwitterEmotions:
     def predict(self, text, sentimemt):
 
         data = Dataprocess(text, sentimemt, self.TOKENIZER)
-        input_ids, attention_mask, token_typeids = data.preprocess_bert()
+        input_ids, attention_mask = data.preprocess_bert()
         model = EmotionModel()
         print(model.summary())
         model.load_weights(os.path.join(self.MODEL_PATH, "roberta_model.pth"))
-        start, end = model.predict([input_ids, attention_mask, token_typeids])
+        start, end = model.predict([input_ids, attention_mask])
         output = data.preprocess_output(start, end)
         return output
