@@ -1,7 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
-from tokenizers import AdamW, get_linear_schedule_with_warmup, ByteLevelBPETokenizer
+from tokenizers import ByteLevelBPETokenizer
+from torch.optim import AdamW
 from utils.model import EmotionModel
 from utils.dataloader import Dataprocess, EmotionData
 from torch.utils.data import DataLoader
@@ -12,14 +13,14 @@ import logging
 
 
 class TwitterEmotions:
-    def __init__(self, model_path="data/roberta/", path="data/roberta/", device="cuda", lowercase=True, MAX_LEN=168):
+    def __init__(self, model_path="data/roberta/", path="data/", device="cuda", lowercase=True, MAX_LEN=168):
 
         self.MODEL_PATH = model_path
         self.DEVICE = device
         self.MAX_LEN = MAX_LEN
         self.TOKENIZER = ByteLevelBPETokenizer(
-            vocab_file=path + "vocab.json",
-            merges_file=path + "merges.txt",
+            vocab=path + "vocab.json",
+            merges=path + "merges.txt",
             lowercase=lowercase,
             add_prefix_space=True,
         )
@@ -39,13 +40,12 @@ class TwitterEmotions:
         model = EmotionModel()
         model.to(DEVICE)
 
-        num_train_steps = int(len(train) / batch_size * epochs)
+        # num_train_steps = int(len(train) / batch_size * epochs)
         optimizer = AdamW(model.parameters(), lr=3e-3)
-        scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=0, num_training_steps=num_train_steps)
 
         best_loss = np.inf
         for epoch in range(epochs):
-            train_loss = train_fn(train_dataloader, model, optimizer, DEVICE, scheduler)
+            train_loss = train_fn(train_dataloader, model, optimizer, DEVICE)
             valid_loss = eval_fn(test_dataloader, model, DEVICE)
 
             if valid_loss < best_loss:
@@ -60,8 +60,10 @@ class TwitterEmotions:
         data = Dataprocess(text, sentimemt, self.TOKENIZER)
         input_ids, attention_mask = data.preprocess_bert()
         model = EmotionModel()
-        print(model.summary())
-        model.load_weights(os.path.join(self.MODEL_PATH, "roberta_model.pth"))
-        start, end = model.predict([input_ids, attention_mask])
+        model.load_state_dict(
+            torch.load(os.path.join(self.MODEL_PATH, "emotion_torch.pth"), map_location=torch.device("cpu")),
+            strict=False,
+        )
+        start, end = model(input_ids, attention_mask)
         output = data.preprocess_output(start, end)
         return output
