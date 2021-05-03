@@ -11,7 +11,7 @@ def loss_fn(start_logits, end_logits, start_positions, end_positions):
     return total_loss
 
 
-def train_fn(data_loader, model, optimizer, device, scheduler):
+def train_fn(data_loader, model, optimizer, device):
     model.train()
     final_loss = 0
 
@@ -25,7 +25,6 @@ def train_fn(data_loader, model, optimizer, device, scheduler):
         )
         loss.backward()
         optimizer.step()
-        scheduler.step()
         final_loss += loss.item()
 
     return final_loss / len(data_loader)

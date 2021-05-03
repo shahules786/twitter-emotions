@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 
 
 class Dataprocess:
-    def __init(self, text, sentiment, tokenizer):
+    def __init__(self, text, sentiment, tokenizer):
 
         self.text = text
         self.tokenizer = tokenizer
@@ -27,14 +27,15 @@ class Dataprocess:
         attention_mask[: len(enc.ids) + 5] = 1
 
         return (
-            torch.tensor(input_ids, dtype=torch.long),
-            torch.tensor(attention_mask, dtype=torch.long),
+            torch.tensor([input_ids], dtype=torch.long),
+            torch.tensor([attention_mask], dtype=torch.long),
         )
 
     def preprocess_output(self, pred_start, pred_end):
 
-        pred_start = torch.softmax(pred_start).cpu().detach().numpy()
-        pred_end = torch.softmax(pred_end).cpu().detach().numpy()
+        print(pred_end)
+        pred_start = torch.softmax(pred_start, dim=1).cpu().detach().numpy()
+        pred_end = torch.softmax(pred_end, dim=1).cpu().detach().numpy()
         start = np.argmax(pred_start)
         end = np.argmax(pred_end) + 1
         ids = self.tokenizer.encode(" " + " ".join(self.text.split())).ids
