@@ -4,9 +4,9 @@ from transformers import RobertaModel, RobertaConfig
 
 
 class EmotionModel(nn.Module):
-    def __init__(self, PATH="data/tf_roberta/"):
+    def __init__(self, PATH="data/"):
         super(EmotionModel, self).__init__()
-        config = RobertaConfig.from_pretrained(PATH + "config.json", return_dict=False)
+        config = RobertaConfig.from_pretrained(PATH, return_dict=False)
         self.bert_model = RobertaModel.from_pretrained(PATH + "pytorch_model.bin", config=config)
         self.dropout = nn.Dropout(0.1)
         self.linear1 = nn.Linear(768, 1)
