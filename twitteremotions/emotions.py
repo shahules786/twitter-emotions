@@ -3,11 +3,13 @@ import pandas as pd
 import numpy as np
 from tokenizers import ByteLevelBPETokenizer
 from torch.optim import AdamW
-from utils.model import EmotionModel
-from utils.dataloader import Dataprocess, EmotionData
 from torch.utils.data import DataLoader
-from utils.engine import train_fn, eval_fn
 from sklearn.model_selection import train_test_split
+
+from twitteremotions.utils.model import EmotionModel
+from twitteremotions.utils.dataloader import Dataprocess, EmotionData
+from twitteremotions.utils.engine import train_fn, eval_fn
+
 import torch
 import logging
 
@@ -62,7 +64,6 @@ class TwitterEmotions:
         model = EmotionModel()
         model.load_state_dict(
             torch.load(os.path.join(self.MODEL_PATH, "emotion_torch.pth"), map_location=torch.device("cpu")),
-            strict=False,
         )
         start, end = model(input_ids, attention_mask)
         output = data.preprocess_output(start, end)
