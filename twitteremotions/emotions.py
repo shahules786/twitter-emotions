@@ -62,7 +62,6 @@ class TwitterEmotions:
         model = EmotionModel()
         model.load_state_dict(
             torch.load(os.path.join(self.MODEL_PATH, "emotion_torch.pth"), map_location=torch.device("cpu")),
-            strict=False,
         )
         start, end = model(input_ids, attention_mask)
         output = data.preprocess_output(start, end)
