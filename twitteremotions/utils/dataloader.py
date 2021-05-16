@@ -36,8 +36,8 @@ class Dataprocess:
         print(pred_end)
         pred_start = torch.softmax(pred_start, dim=1).cpu().detach().numpy()
         pred_end = torch.softmax(pred_end, dim=1).cpu().detach().numpy()
-        start = np.argmax(pred_start)
-        end = np.argmax(pred_end) + 1
+        start = np.argmax(pred_start) - 4
+        end = np.argmax(pred_end) + 1 - 4
         ids = self.tokenizer.encode(" " + " ".join(self.text.split())).ids
         output = self.tokenizer.decode(ids[start:end])
 
