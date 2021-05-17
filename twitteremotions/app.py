@@ -20,7 +20,7 @@ def predict():
     sentiment = request.args.get("sentiment", "neutral")
     response = {}
     response["selected"] = emotion.predict(sentence, sentiment)
-    response["time"] = datetime.now() - start
+    response["time"] = str(datetime.now() - start)
 
     return flask.jsonify(response)
 
