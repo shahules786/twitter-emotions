@@ -27,7 +27,7 @@ class TwitterEmotions:
         )
 
         self.model = EmotionModel()
-        DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        DEVICE = torch.device("cpu")
         self.model.load_state_dict(
             torch.load(os.path.join(self.MODEL_PATH, "emotion_torch.pth"), map_location=DEVICE),
         )
