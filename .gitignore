@@ -136,7 +136,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
+*.csv
 *.h5
 *.pth 
 *.bin
