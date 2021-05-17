@@ -33,7 +33,6 @@ class Dataprocess:
 
     def preprocess_output(self, pred_start, pred_end):
 
-        print(pred_end)
         pred_start = torch.softmax(pred_start, dim=1).cpu().detach().numpy()
         pred_end = torch.softmax(pred_end, dim=1).cpu().detach().numpy()
         start = np.argmax(pred_start) - 4
