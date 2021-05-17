@@ -15,7 +15,7 @@ import logging
 
 
 class TwitterEmotions:
-    def __init__(self, model_path="data/roberta/", path="data/", device="cuda", lowercase=True, MAX_LEN=168):
+    def __init__(self, model_path="data/", path="data/roberta/", device="cuda", lowercase=True, MAX_LEN=168):
         self.MODEL_PATH = model_path
         self.DEVICE = device
         self.MAX_LEN = MAX_LEN
