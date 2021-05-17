@@ -17,13 +17,14 @@ def train():
 def predict():
     start = datetime.now()
     sentence = request.args.get("sentence")
-    sentiment = request.args.get("sentiment")
+    sentiment = request.args.get("sentiment", "neutral")
     response = {}
     response["selected"] = emotion.predict(sentence, sentiment)
-    response["time"] = datetime.now() - start
+    response["time"] = str(datetime.now() - start)
 
     return flask.jsonify(response)
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     emotion = TwitterEmotions()
+    app.run(host="0.0.0.0", port="9999", debug=True)

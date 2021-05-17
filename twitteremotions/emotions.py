@@ -16,15 +16,20 @@ import logging
 
 class TwitterEmotions:
     def __init__(self, model_path="data/roberta/", path="data/", device="cuda", lowercase=True, MAX_LEN=168):
-
         self.MODEL_PATH = model_path
         self.DEVICE = device
         self.MAX_LEN = MAX_LEN
         self.TOKENIZER = ByteLevelBPETokenizer(
-            vocab=path + "vocab.json",
-            merges=path + "merges.txt",
+            vocab_file=path + "vocab.json",
+            merges_file=path + "merges.txt",
             lowercase=lowercase,
             add_prefix_space=True,
+        )
+
+        self.model = EmotionModel()
+        DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model.load_state_dict(
+            torch.load(os.path.join(self.MODEL_PATH, "emotion_torch.pth"), map_location=DEVICE),
         )
 
     def train(self, train_path="data/train.csv", epochs=10, batch_size=32, max_len=168, test_size=0.25):
@@ -61,10 +66,6 @@ class TwitterEmotions:
 
         data = Dataprocess(text, sentimemt, self.TOKENIZER)
         input_ids, attention_mask = data.preprocess_bert()
-        model = EmotionModel()
-        model.load_state_dict(
-            torch.load(os.path.join(self.MODEL_PATH, "emotion_torch.pth"), map_location=torch.device("cpu")),
-        )
-        start, end = model(input_ids, attention_mask)
+        start, end = self.model(input_ids, attention_mask)
         output = data.preprocess_output(start, end)
         return output
