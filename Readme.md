@@ -12,3 +12,27 @@
 
 
 Extract phrase in the given text that is used to express the sentiment. Capturing sentiment in language is important in these times where decisions and reactions are created and updated in seconds. But, which words actually lead to the sentiment description? This project aims to solve this problem.
+
+## Try it out.
+
+
+```bash
+
+git clone https://github.com/shahules786/twitter-emotions.git
+
+cd twitter-emotions
+
+sudo docker build --tag twitter-emotions:api .
+
+sudo docker run -p 9999:9999  -it twitter-emotions:api python twitteremotions/app.py
+
+
+```
+
+Server will start running on port 9999 of localhost.
+
+## Example
+
+```html
+http://127.0.0.1:9999/predict?sentence=He is awesome!&sentiment=positive
+````
