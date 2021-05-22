@@ -37,7 +37,7 @@ Server will start running on port 9999 of localhost
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/25312635/119227824-7a04f600-bb2d-11eb-8c01-d33a12b32186.gif" />
+  <img src="https://user-images.githubusercontent.com/25312635/119235209-fa881e80-bb4e-11eb-8a2a-8d7ff4b5f439.gif" />
 </p>
 
 
