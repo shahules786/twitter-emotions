@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, render_template
 import flask
 from twitteremotions.emotions import TwitterEmotions
 from datetime import datetime
@@ -13,16 +13,21 @@ def train():
     emotion.train(train_path, epochs)
 
 
-@app.route("/predict")
+@app.route("/", methods=["POST", "GET"])
 def predict():
-    start = datetime.now()
-    sentence = request.args.get("sentence")
-    sentiment = request.args.get("sentiment", "neutral")
-    response = {}
-    response["selected"] = emotion.predict(sentence, sentiment)
-    response["time"] = str(datetime.now() - start)
 
-    return flask.jsonify(response)
+    if request.method == "POST":
+        start = datetime.now()
+        sentence = request.form.get("tweet")
+        sentiment = request.form.get("Sentiment", "neutral")
+        response = {}
+        response["tweet"] = sentence
+        response["sentiment"] = sentiment
+        response["selected"] = emotion.predict(sentence, sentiment)
+        response["time"] = str(datetime.now() - start)
+        return render_template("index.html", prediction=response["selected"])
+
+    return render_template("index.html")
 
 
 if __name__ == "__main__":
