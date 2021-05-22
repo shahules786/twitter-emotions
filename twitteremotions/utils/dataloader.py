@@ -40,7 +40,7 @@ class Dataprocess:
         ids = self.tokenizer.encode(" " + " ".join(self.text.split())).ids
         output = self.tokenizer.decode(ids[start:end])
 
-        return output
+        return output.strip()
 
 
 class EmotionData(Dataset):
