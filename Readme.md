@@ -29,10 +29,16 @@ sudo docker run -p 9999:9999  -it twitter-emotions:api python twitteremotions/ap
 
 ```
 
-Server will start running on port 9999 of localhost.
+Server will start running on port 9999 of localhost
+
 
 ## Example
 
-```html
-http://127.0.0.1:9999/predict?sentence=He is awesome!&sentiment=positive
-````
+
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/25312635/119227824-7a04f600-bb2d-11eb-8c01-d33a12b32186.gif" />
+</p>
+
+
+
