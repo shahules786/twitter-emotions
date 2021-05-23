@@ -13,6 +13,8 @@
 
 Extract phrase in the given text that is used to express the sentiment. Capturing sentiment in language is important in these times where decisions and reactions are created and updated in seconds. But, which words actually lead to the sentiment description? This project aims to solve this problem.
 
+Powered using Pytorch + hugggingface 🤗
+
 ## Try it out.
 
 
@@ -39,6 +41,34 @@ Server will start running on port 9999 of localhost
 <p align="center">
   <img src="https://user-images.githubusercontent.com/25312635/119227824-7a04f600-bb2d-11eb-8c01-d33a12b32186.gif" />
 </p>
+
+
+
+## Installation for development
+
+```bash
+
+git clone https://github.com/shahules786/twitter-emotions.git
+
+cd twitter-emotions
+
+pip install -r requirements.txt
+
+```
+
+Train Model on your data
+
+```python
+from twitteremotions.emotions import TwitterEmotions
+emotions = TwitterEmotions()
+emotions.train(train_path="data/train.csv", epochs=10, batch_size=32, max_len=168, test_size=0.25)
+```
+
+## Contributing
+All contrbutions are welcome 👋
+
+
+
 
 
 
