@@ -21,7 +21,7 @@ def train_fn(data_loader, model, optimizer, device):
         optimizer.zero_grad()
         start, end = model(data["input_ids"], data["attention_mask"])
         loss = loss_fn(
-            start, end, torch.argmax(data["start_tokens"], axis=1), torch.argmax(data["start_tokens"], axis=1)
+            start, end, torch.argmax(data["start_tokens"], axis=1), torch.argmax(data["end_tokens"], axis=1)
         )
         loss.backward()
         optimizer.step()
@@ -39,7 +39,7 @@ def eval_fn(data_loader, model, device):
             data[k] = v.to(device)
         start, end = model(data["input_ids"], data["attention_mask"])
         loss = loss_fn(
-            start, end, torch.argmax(data["start_tokens"], axis=1), torch.argmax(data["start_tokens"], axis=1)
+            start, end, torch.argmax(data["start_tokens"], axis=1), torch.argmax(data["end_tokens"], axis=1)
         )
         final_loss += loss.item()
 
